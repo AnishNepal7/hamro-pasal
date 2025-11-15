@@ -208,7 +208,7 @@ class DashboardController extends Controller
             'revenue_forecast' => $revenueResponse->successful() ? $revenueResponse->json() : $revenueResponse->body(),
         ];
     }
-    public function forcastAllProdcuts()
+    public function forecastAllProducts()
     {
         $products = Product::all();
         $forecasts = [];
