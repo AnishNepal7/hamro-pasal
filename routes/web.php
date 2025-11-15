@@ -96,12 +96,12 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    // ✅ Optional: Supplier-wise purchase history
+    //  Optional: Supplier-wise purchase history
     Route::get('/purchases/supplier/{supplier_id}', [PurchaseController::class, 'supplierHistory'])
         ->name('purchases.supplier.history');
 
 
-    // ✅ Purchase Items Routes
+    //Purchase Items Routes
      Route::resource('purchase_items', PurchaseItemController::class);
      // Sales
 Route::get('/reports/sales', [SaleController::class, 'salesReport'])->name('sales.report');
@@ -123,7 +123,9 @@ Route::get('/reports/products', [SaleController::class, 'productReport'])->name(
     [StockMovementController::class, 'downloadReport'])
     ->name('stock_movement.report');
 
-
+//forecast all products
+Route::get('/forecast-all-products', [DashboardController::class, 'forcastAllProdcuts'])
+    ->name('forecast.all.products');
 
     // Test route for debugging roles
     Route::get('/test-role', function () {

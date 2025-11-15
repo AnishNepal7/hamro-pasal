@@ -179,10 +179,10 @@ class DashboardController extends Controller
             ->get();
 
         if ($rows->isEmpty()) {
-            return response()->json([
+            return [
                 'message' => 'No sale items found for this product in the requested window.',
                 'forecast' => null
-            ], 200);
+            ];
         }
 
         // build payload matching forecasting-service expected shape
@@ -200,13 +200,21 @@ class DashboardController extends Controller
         $salesResponse = Http::post($FORECASTER_URL . '/forecast/sales', $payload);
         $revenueResponse = Http::post($FORECASTER_URL . '/forecast/revenue', $payload);
 
-        return response()->json([
+        return [
             'payload' => $payload,
             'sales_forecast' => $salesResponse->successful() ? $salesResponse->json() : $salesResponse->body(),
             'revenue_forecast' => $revenueResponse->successful() ? $revenueResponse->json() : $revenueResponse->body(),
-        ], 200);
+        ];
     }
-
+    public function forcastAllProdcuts()
+    {
+        $products = Product::all();
+        $forecasts = [];
+        foreach ($products as $product) {
+            $forecasts[$product->id] = $this->forecastProduct($product->id);
+        }
+        return response()->json($forecasts);
+    }
 
 
 
