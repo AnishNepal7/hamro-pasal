@@ -16,6 +16,7 @@
         <button id="refresh" class="bg-blue-500 text-white px-3 py-1 rounded">Refresh</button>
     </div>
 
+    <div id="loader" class="mb-4 text-center" style="display:none">Loading forecasts…</div>
     <div class="overflow-x-auto bg-white rounded shadow">
         <table class="min-w-full divide-y divide-gray-200" id="forecastTable">
             <thead class="bg-gray-50">
@@ -41,51 +42,32 @@
 
 @push('scripts')
 <script>
-    // Endpoint - use the named route so it matches your routes/web.php
     const ENDPOINT = '{{ route("forecast.all.products") }}';
 
-    let rawResults = []; // array of {product_id, product_name, sales_forecast, revenue_forecast}
+    const loaderEl = document.getElementById('loader');
+    let rawResults = [];
     let filtered = [];
     let currentPage = 1;
-    let perPage = parseInt(document.getElementById('perPage').value || 10, 10);
 
-    function safeNumber(v) {
-        if (v === null || v === undefined) return 0;
-        if (typeof v === 'number') return v;
-        const n = Number(v);
-        return isNaN(n) ? 0 : n;
-    }
-
-    function extractWeekly(obj, keys) {
-        // Try several likely property names
-        if (!obj) return 0;
-        for (const k of keys) {
-            if (obj[k] !== undefined) return safeNumber(obj[k]);
-            if (obj.data && obj.data[k] !== undefined) return safeNumber(obj.data[k]);
-            if (obj.payload && obj.payload[k] !== undefined) return safeNumber(obj.payload[k]);
-        }
-        // if object is a number-like
-        if (typeof obj === 'number') return obj;
-        if (obj.forecast !== undefined) return safeNumber(obj.forecast);
-        return 0;
+    function showLoader(on) {
+        loaderEl.style.display = on ? 'block' : 'none';
     }
 
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-
-        perPage = parseInt(document.getElementById('perPage').value || 10, 10);
+        const perPage = parseInt(document.getElementById('perPage').value || 10, 10);
         const start = (currentPage - 1) * perPage;
         const pageItems = filtered.slice(start, start + perPage);
 
         for (const row of pageItems) {
-            const weeklySales = extractWeekly(row.sales_forecast, ['weekly_sales_forecast','weekly_sales_total','weekly_sales','weekly_sales_forecast','weekly_sales_total','weekly_forecast','forecast']);
-            const weeklyRev = extractWeekly(row.revenue_forecast, ['weekly_revenue_forecast','weekly_revenue_total','weekly_revenue','weekly_rev','weekly_revenue_forecast','weekly_revenue_total','weekly_forecast','forecast']);
+            const weeklySales = Number(row.weekly_sales) || 0;
+            const weeklyRev = Number(row.weekly_revenue) || 0;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.product_id}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.product_name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.product_id ?? ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.product_name ?? ''}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${weeklySales.toFixed(2)}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${weeklyRev.toFixed(2)}</td>
             `;
@@ -107,28 +89,27 @@
     }
 
     async function fetchForecasts() {
+        showLoader(true);
         document.getElementById('refresh').disabled = true;
         try {
             const res = await fetch(ENDPOINT, { headers: { 'Accept': 'application/json' }});
-            if (!res.ok) throw new Error('Network response was not ok');
+            if (!res.ok) throw new Error('Network response was not ok: ' + res.status);
             const data = await res.json();
 
-            // data might be object keyed by id or {count, results} etc.
-            let list = [];
-            if (Array.isArray(data)) list = data;
-            else if (data.results && Array.isArray(data.results)) list = data.results;
-            else if (typeof data === 'object') {
-                // if keyed by id
-                list = Object.keys(data).map(k => data[k]);
-            }
+            // data is expected as an object keyed by id -> item
+            const list = Object.keys(data).map(k => data[k]);
 
-            // normalize entries to have product_id and product_name
             rawResults = list.map(item => {
+                if (!item) return { product_id: null, product_name: '', weekly_sales: 0, weekly_revenue: 0 };
+
+                const weeklySales = item.sales_forecast && (item.sales_forecast.weekly_sales_forecast ?? item.sales_forecast.weekly_sales_total ?? item.sales_forecast.weekly_sales) ;
+                const weeklyRev = item.revenue_forecast && (item.revenue_forecast.weekly_revenue_forecast ?? item.revenue_forecast.weekly_revenue_total ?? item.revenue_forecast.weekly_revenue);
+
                 return {
-                    product_id: item.product_id ?? item.id ?? null,
-                    product_name: item.product_name ?? item.name ?? (item.payload && item.payload.sales && item.payload.sales[0] ? item.payload.sales[0].product_name : null) ?? '',
-                    sales_forecast: item.sales_forecast ?? item.sales ?? null,
-                    revenue_forecast: item.revenue_forecast ?? item.revenue ?? null,
+                    product_id: item.product_id ?? null,
+                    product_name: item.product_name ?? '',
+                    weekly_sales: Number(weeklySales) || 0,
+                    weekly_revenue: Number(weeklyRev) || 0,
                 };
             });
 
@@ -139,16 +120,16 @@
             console.error('Failed to load forecasts', err);
             alert('Failed to load forecasts: ' + err.message);
         } finally {
+            showLoader(false);
             document.getElementById('refresh').disabled = false;
         }
     }
 
-    // hooks
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('search').addEventListener('input', () => applySearch());
         document.getElementById('perPage').addEventListener('change', () => renderTable());
         document.getElementById('prevPage').addEventListener('click', () => { if (currentPage>1) { currentPage--; renderTable(); } });
-        document.getElementById('nextPage').addEventListener('click', () => { if ((currentPage*perPage) < filtered.length) { currentPage++; renderTable(); } });
+        document.getElementById('nextPage').addEventListener('click', () => { const perPage = parseInt(document.getElementById('perPage').value||10,10); if ((currentPage*perPage) < filtered.length) { currentPage++; renderTable(); } });
         document.getElementById('refresh').addEventListener('click', fetchForecasts);
 
         fetchForecasts();
