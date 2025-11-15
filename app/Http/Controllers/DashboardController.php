@@ -159,6 +159,7 @@ class DashboardController extends Controller
 
       public function forecastProduct(int $productId)
     {
+        $productId=$productId;
         $FORECASTER_URL = env('FORECAST_SERVICE_URL', 'http://localhost:8002'); // adjust in .env
         $N = 28;
         $PROJ = 7;
@@ -201,7 +202,8 @@ class DashboardController extends Controller
         $revenueResponse = Http::post($FORECASTER_URL . '/forecast/revenue', $payload);
 
         return [
-            'payload' => $payload,
+            'product_id' => $productId,
+            'product_name' => Product::find($productId)->name,
             'sales_forecast' => $salesResponse->successful() ? $salesResponse->json() : $salesResponse->body(),
             'revenue_forecast' => $revenueResponse->successful() ? $revenueResponse->json() : $revenueResponse->body(),
         ];
