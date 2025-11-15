@@ -32,10 +32,10 @@
     </div>
 
     {{-- === SALES VS PROFIT COMPARISON === --}}
-    <div class="metallic-card p-6 mb-8">
+    <!-- <div class="metallic-card p-6 mb-8">
         <h3 class="text-xl font-bold text-metallic-mid mb-4">Sales vs Profit (Last 30 Days)</h3>
         <canvas id="salesProfitChart" height="150"></canvas>
-    </div>
+    </div> -->
 
     <!-- {{-- === STOCK MOVEMENT PIE === --}}
     <div class="metallic-card p-6 mb-8">
@@ -162,29 +162,29 @@ new Chart(profitCtx, {
 });
 
 // SALES VS PROFIT
-const salesProfitCtx = document.getElementById('salesProfitChart').getContext('2d');
-new Chart(salesProfitCtx, {
-    type: 'line',
-    data: {
-        labels: @json($salesChart['labels']),
-        datasets: [
-            {
-                label: 'Sales (Rs)',
-                data: @json($salesChart['totals']),
-                borderColor: '#d4af37',
-                fill: false,
-                tension: 0.4
-            },
-            {
-                label: 'Profit (Rs)',
-                data: @json($profitChart['profits']),
-                borderColor: '#22c55e',
-                fill: false,
-                tension: 0.4
-            }
-        ]
-    }
-});
+// const salesProfitCtx = document.getElementById('salesProfitChart').getContext('2d');
+// new Chart(salesProfitCtx, {
+//     type: 'line',
+//     data: {
+//         labels: @json($salesChart['labels']),
+//         datasets: [
+//             {
+//                 label: 'Sales (Rs)',
+//                 data: @json($salesChart['totals']),
+//                 borderColor: '#d4af37',
+//                 fill: false,
+//                 tension: 0.4
+//             },
+//             {
+//                 label: 'Profit (Rs)',
+//                 data: @json($profitChart['profits']),
+//                 borderColor: '#22c55e',
+//                 fill: false,
+//                 tension: 0.4
+//             }
+//         ]
+//     }
+// });
 
 // STOCK PIE
 const stockCtx = document.getElementById('stockPie').getContext('2d');

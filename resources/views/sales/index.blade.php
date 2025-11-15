@@ -53,21 +53,46 @@
             </div>
 
             {{-- CUSTOMER NAME --}}
-            <div>
+            <!-- <div>
                 <label class="block mb-1 text-metallic-mid font-semibold">Customer</label>
                 <input type="text" name="customer_name"
                     placeholder="Enter Customer Name"
                     class="rounded px-3 py-2 bg-steel-700 text-white w-full">
-            </div>
+            </div> -->
 
             {{-- PRODUCT NAME --}}
-            <div>
+            <!-- <div>
                 <label class="block mb-1 text-metallic-mid font-semibold">Product</label>
                 <input type="text" name="product_name"
                     placeholder="Enter Product Name"
                     class="rounded px-3 py-2 bg-steel-700 text-white w-full">
+            </div> -->
+
+            {{-- 🔹 CUSTOMER DROPDOWN --}}
+            <div>
+                <label class="block text-sm font-semibold">Select Customer</label>
+                <select name="customer_name" class="rounded px-3 py-2 bg-steel-700 text-white w-full">
+                    <option value="">-- All Customers --</option>
+                    @foreach($customers as $customer)
+                    <option value="{{ $customer->name }}">
+                        {{ $customer->name }}
+                    </option>
+                    @endforeach
+                </select>
             </div>
 
+            {{-- 🔹 PRODUCT DROPDOWN --}}
+            <div>
+                <label class="block text-sm font-semibold">Select Product</label>
+                <select name="product_name" class="rounded px-3 py-2 bg-steel-700 text-white w-full">
+                    <option value="">-- All Products --</option>
+                    @foreach($products as $product)
+                    <option value="{{ $product->name }}">
+                        {{ $product->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit"
                 class="bg-metallic-gold text-black px-6 py-3 rounded hover:bg-yellow-400 transition-colors font-bold col-span-1 md:col-span-5">
                 ⬇ Download PDF Report
@@ -93,46 +118,46 @@
 
                 <tbody>
                     @forelse ($sales as $sale)
-                        <tr class="hover:bg-steel-700/30 transition-colors duration-200">
+                    <tr class="hover:bg-steel-700/30 transition-colors duration-200">
 
-                            <td class="px-8 py-6 text-lg">{{ $loop->iteration }}</td>
+                        <td class="px-8 py-6 text-lg">{{ $loop->iteration }}</td>
 
-                            <td class="px-8 py-6 text-lg">
-                                {{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y') }}
-                            </td>
+                        <td class="px-8 py-6 text-lg">
+                            {{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y') }}
+                        </td>
 
-                            <td class="px-8 py-6 text-lg">{{ $sale->customer->name ?? 'Walk-in' }}</td>
+                        <td class="px-8 py-6 text-lg">{{ $sale->customer->name ?? 'Walk-in' }}</td>
 
-                            <td class="px-8 py-6 text-lg">
-                                @foreach ($sale->saleItems as $item)
-                                    <div>{{ $item->product->name }} × {{ $item->quantity }}</div>
-                                @endforeach
-                            </td>
+                        <td class="px-8 py-6 text-lg">
+                            @foreach ($sale->saleItems as $item)
+                            <div>{{ $item->product->name }} × {{ $item->quantity }}</div>
+                            @endforeach
+                        </td>
 
-                            <td class="px-8 py-6 text-lg text-metallic-gold font-bold">
-                                Rs. {{ number_format($sale->final_amount, 2) }}
-                            </td>
+                        <td class="px-8 py-6 text-lg text-metallic-gold font-bold">
+                            Rs. {{ number_format($sale->final_amount, 2) }}
+                        </td>
 
-                            {{-- ==== INVOICE BUTTON ==== --}}
-                            <td class="px-8 py-6">
-                                <a href="{{ route('sales.invoice', $sale->id) }}"
-                                    class="px-5 py-2 rounded bg-metallic-gold text-black font-bold hover:bg-yellow-400">
-                                    🧾 Invoice
-                                </a>
-                            </td>
+                        {{-- ==== INVOICE BUTTON ==== --}}
+                        <td class="px-8 py-6">
+                            <a href="{{ route('sales.invoice', $sale->id) }}"
+                                class="px-5 py-2 rounded bg-metallic-gold text-black font-bold hover:bg-yellow-400">
+                                🧾 Invoice
+                            </a>
+                        </td>
 
-                        </tr>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="8"
-                                class="px-8 py-12 text-center text-metallic-mid text-lg">
-                                No sales found.
-                                <a href="{{ route('sales.create') }}"
-                                    class="text-metallic-gold hover:text-yellow-300">
-                                    Create one now
-                                </a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="8"
+                            class="px-8 py-12 text-center text-metallic-mid text-lg">
+                            No sales found.
+                            <a href="{{ route('sales.create') }}"
+                                class="text-metallic-gold hover:text-yellow-300">
+                                Create one now
+                            </a>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -140,11 +165,11 @@
 
         {{-- Pagination --}}
         @if ($sales->hasPages())
-            <div class="mt-8 flex justify-center">
-                <div class="bg-steel-700/50 rounded-lg p-4">
-                    {{ $sales->links() }}
-                </div>
+        <div class="mt-8 flex justify-center">
+            <div class="bg-steel-700/50 rounded-lg p-4">
+                {{ $sales->links() }}
             </div>
+        </div>
         @endif
     </div>
 </div>

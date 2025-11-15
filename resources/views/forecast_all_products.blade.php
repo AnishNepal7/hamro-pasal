@@ -1,137 +1,82 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Product Forecast</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.app')
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('content')
+<div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-4xl font-bold metallic-text-gold font-orbitron">PRODUCT FORECASTS</h2>
+        <a href="/dashboard" class="metallic-btn px-8 py-4 text-lg font-bold rounded-lg text-metallic-light hover:text-white transition-colors duration-300">
+            ← Return to Dashboard
+        </a>
+    </div>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #eef2f7;
-            padding: 30px;
-        }
+    {{-- Loading Indicator --}}
+    <div id="loading" class="flex justify-center items-center py-16">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-300 border-t-yellow-400"></div>
+    </div>
 
-        /* Header + Dashboard Button */
-        .header {
-            width: 85%;
-            margin: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        h2 {
-            color: #333;
-            letter-spacing: 1px;
-        }
-
-        .btn-dashboard {
-            background: #4a90e2;
-            padding: 10px 18px;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-dashboard:hover {
-            background: #3a7ac7;
-        }
-
-        /* Card Container */
-        .container {
-            width: 85%;
-            margin: 25px auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-        }
-
-        /* Table Styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e6e6e6;
-        }
-
-        th {
-            background: #304ffe;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        tr:hover {
-            background: #f4f7ff;
-        }
-
-        td {
-            font-size: 15px;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <h2>All Products Forecast</h2>
-    <a href="/dashboard" class="btn-dashboard">← Return to Dashboard</a>
+    {{-- Forecast Table --}}
+    <div id="forecastContent" class="metallic-card p-8 rounded-xl hidden">
+        <div class="overflow-x-auto">
+            <table class="metallic-table min-w-full rounded-lg overflow-hidden border">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-4 text-left">Product ID</th>
+                        <th class="px-6 py-4 text-left">Product Name</th>
+                        <th class="px-6 py-4 text-center">Weekly Sales Forecast</th>
+                        <th class="px-6 py-4 text-center">Weekly Revenue Forecast</th>
+                    </tr>
+                </thead>
+                <tbody id="forecastTableBody">
+                    {{-- AJAX will populate this --}}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<div class="container">
-    <table id="forecastTable">
-        <thead>
-            <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Weekly Sales Forecast</th>
-                <th>Weekly Revenue Forecast</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
-
+{{-- jQuery for fetching forecast --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     $.ajax({
         url: "/forecast-all-products",
         type: "GET",
         dataType: "json",
-
         success: function(data) {
-            let tbody = $("#forecastTable tbody");
+            let tbody = $("#forecastTableBody");
             tbody.empty();
 
-            $.each(data, function(key, item) {
+            // Convert object to array
+            let list = Object.values(data);
+
+            $.each(list, function(key, item) {
+                // Skip products without forecast
+                let salesForecast = item.sales_forecast?.weekly_sales_forecast ?? 'No data';
+                let revenueForecast = item.revenue_forecast?.weekly_revenue_forecast ?? 'No data';
+
+                // Skip invalid products
+                if (!item.product_id || !item.product_name) return;
+
                 let row = `
-                    <tr>
-                        <td>${item.product_id}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.sales_forecast.weekly_sales_forecast}</td>
-                        <td>${item.revenue_forecast.weekly_revenue_forecast}</td>
+                    <tr class="hover:bg-steel-700/30 transition-colors duration-200">
+                        <td class="px-6 py-4 text-lg font-mono">${item.product_id}</td>
+                        <td class="px-6 py-4 text-lg font-semibold">${item.product_name}</td>
+                        <td class="px-6 py-4 text-center text-lg">${salesForecast}</td>
+                        <td class="px-6 py-4 text-center text-lg">${revenueForecast}</td>
                     </tr>
                 `;
                 tbody.append(row);
             });
-        },
 
+            // Hide loader and show table
+            $("#loading").hide();
+            $("#forecastContent").removeClass("hidden");
+        },
         error: function(xhr) {
-            console.log("Error:", xhr.responseText);
+            $("#loading").html(`<div class="text-red-400 text-lg">Error loading forecast data!</div>`);
+            console.error("Error:", xhr.responseText);
         }
     });
 });
 </script>
-
-</body>
-</html>
+@endsection

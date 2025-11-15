@@ -133,6 +133,7 @@ class DashboardController extends Controller
             ->orderByDesc('total_revenue')
             ->take(5)
             ->get();
+        
     }
 
     private function getTopCustomers()
@@ -159,7 +160,7 @@ class DashboardController extends Controller
 
       public function forecastProduct(int $productId)
     {
-        $productId=$productId;
+        // $productId=$productId;
         $FORECASTER_URL = env('FORECAST_SERVICE_URL', 'http://localhost:8002'); // adjust in .env
         $N = 28;
         $PROJ = 7;

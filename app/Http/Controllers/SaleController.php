@@ -17,11 +17,19 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SaleController extends Controller
 {
-    public function index()
-    {
-        $sales = Sale::with('customer')->latest()->paginate(10);
-        return view('sales.index', compact('sales'));
-    }
+    // public function index()
+    // {
+    //     $sales = Sale::with('customer')->latest()->paginate(10);
+    //     return view('sales.index', compact('sales'));
+    // }
+       public function index()
+{
+    $sales = Sale::latest()->paginate(10);
+    $customers = Customer::orderBy('name')->get();
+    $products = Product::orderBy('name')->get(); 
+
+    return view('sales.index', compact('sales','customers','products'));
+}
 
     public function create()
     {

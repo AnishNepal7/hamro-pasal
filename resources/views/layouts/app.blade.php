@@ -472,11 +472,11 @@
         <!-- Page Content -->
         <main>
             <!-- Flash Messages -->
-            @if (session('success'))
+            <!-- @if (session('success'))
                 <div class="alert alert-success">
                     <strong>Success!</strong> {{ session('success') }}
                 </div>
-            @endif
+            @endif -->
 
             @if (session('error'))
                 <div class="alert alert-error">
