@@ -41,9 +41,8 @@
 
 @push('scripts')
 <script>
-    // Endpoint - adjust if your route differs. The controller currently exposes '/forcastAllProdcuts' or similar;
-    // The user requested '/forecast-all-product' — ensure a route exists that points to the controller method.
-    const ENDPOINT = '/forecast-all-product';
+    // Endpoint - use the named route so it matches your routes/web.php
+    const ENDPOINT = '{{ route("forecast.all.products") }}';
 
     let rawResults = []; // array of {product_id, product_name, sales_forecast, revenue_forecast}
     let filtered = [];
