@@ -124,8 +124,18 @@ Route::get('/reports/products', [SaleController::class, 'productReport'])->name(
     ->name('stock_movement.report');
 
 //forecast all products
+// API endpoint (used by JS) - returns forecasts for all products
+Route::get('/forecast-all-product', [DashboardController::class, 'forcastAllProdcuts'])
+    ->name('forecast.all.product');
+
+// Keep existing plural route for backward compatibility
 Route::get('/forecast-all-products', [DashboardController::class, 'forcastAllProdcuts'])
     ->name('forecast.all.products');
+
+// UI page that shows the forecasts table
+Route::get('/admin/forecasts', function () {
+    return view('forecast_all_products');
+})->name('forecast.page');
 
     // Test route for debugging roles
     Route::get('/test-role', function () {
