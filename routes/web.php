@@ -125,11 +125,9 @@ Route::get('/reports/products', [SaleController::class, 'productReport'])->name(
 
 //forecast all products
 // API endpoint (used by JS) - returns forecasts for all products
-Route::get('/forecast-all-product', [DashboardController::class, 'forcastAllProdcuts'])
-    ->name('forecast.all.product');
 
 // Keep existing plural route for backward compatibility
-Route::get('/forecast-all-products', [DashboardController::class, 'forcastAllProdcuts'])
+Route::get('/forecast-all-products', [DashboardController::class, 'forecastAllProducts'])
     ->name('forecast.all.products');
 
 // UI page that shows the forecasts table
