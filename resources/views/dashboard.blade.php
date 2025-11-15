@@ -37,13 +37,13 @@
         <canvas id="salesProfitChart" height="150"></canvas>
     </div>
 
-    {{-- === STOCK MOVEMENT PIE === --}}
+    <!-- {{-- === STOCK MOVEMENT PIE === --}}
     <div class="metallic-card p-6 mb-8">
         <h3 class="text-xl font-bold text-metallic-mid mb-4">Stock Movements (IN vs OUT)</h3>
         <canvas id="stockPie" height="120"></canvas>
-    </div>
+    </div> -->
 
-    {{-- === FORECAST DAILY CHARTS === --}}
+    <!-- {{-- === FORECAST DAILY CHARTS === --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <div class="metallic-card p-6">
             <h3 class="text-xl font-bold text-metallic-mid mb-2">Daily Forecast (Quantity)</h3>
@@ -54,7 +54,7 @@
             <h3 class="text-xl font-bold text-metallic-mid mb-2">Daily Forecast Revenue</h3>
             <canvas id="forecastRevenueBar" height="150"></canvas>
         </div>
-    </div>
+    </div> -->
 
     {{-- === TOP PRODUCTS / CUSTOMERS / SUPPLIERS === --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">

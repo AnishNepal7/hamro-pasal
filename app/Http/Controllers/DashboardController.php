@@ -222,6 +222,31 @@ class DashboardController extends Controller
 
 
 
+    // ===================== Forecast Method =====================
+  private function getForecastData()
+{
+    // Get all sales from the database (or last N days if needed)
+    $sales = Sale::select('sale_date','total_amount')
+        ->orderBy('sale_date')
+        ->get()
+        ->map(function($sale) {
+            return [
+                'date' => Carbon::parse($sale->sale_date)->format('Y-m-d'),
+                'quantity' => 1, // can be total quantity if you track quantity
+                'price' => $sale->total_amount
+            ];
+        });
 
+    // Prepare arrays for Blade/Chart.js
+    $dates = $sales->pluck('date')->toArray();
+    $qty   = $sales->pluck('quantity')->toArray();
+    $revenue = $sales->pluck('price')->toArray();
+
+    return [
+        'forecast_dates' => $dates,
+        'forecast_qty'   => $qty,
+        'forecast_revenue' => $revenue,
+    ];
+}
 
 }
