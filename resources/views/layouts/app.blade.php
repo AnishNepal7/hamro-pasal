@@ -441,6 +441,11 @@
                                 <span class="mr-2">💰</span>
                                 Record Sale
                             </a>
+                                                    <!-- Forecast Button -->
+                            <a href="{{ route('forecast.page') }}" class="metallic-btn-nav">
+                                <span class="mr-2">🔮</span>
+                                Forecast
+                            </a>
                         
                         <!-- Categories Button (Role-based) -->
                         @if(auth()->user()->hasAnyRole(['admin', 'shopkeeper']))
